@@ -30,6 +30,8 @@ print <<END;
 <b>Full:</b> number of exercises done before the primary deadline for full points<br/>
 <b>Half:</b> number of exercises done after the primary deadline, before Module closed<br/>
 <b>Points:</b> Full + Half / 2<br/>
+Red module score means that the module is not accepted: not enough tasks were completed.<br/>
+<b>Passed:</b> Number of modules passed (at least 60% of tasks completed)<br/>
   <table class="points">
     <thead>
       <tr>
@@ -55,6 +57,9 @@ print <<END;
           <td>
             Total
           </td>
+<td>
+Passed
+</td>
       </tr>
     </thead>
 	<tbody>	  
@@ -66,6 +71,7 @@ my @numtasks;
 my @alldone;
 my %line;
 my %upoints;
+my %accepted;
 
 $numtasks[1] = 10;
 $numtasks[2] = 12;
@@ -86,9 +92,6 @@ for ($i = 1; $i <= $modules; $i++) {
 		  $line{$fields[0]} = "";
 		  $upoints{$fields[0]} = 0;
 		}
-		$ll = sprintf("<td>%d</td> <td>%d</td> <td>%.1f</td> ", $fields[1], $fields[2] - $fields[1], $points);
-		$line{$fields[0]} = $line{$fields[0]} . $ll;
-		$upoints{$fields[0]} += $points;
 		#printf("<td>%.1f</td>", $points);
 		#printf("<td>%.1f</td></tr>\n", $points);
 
@@ -96,22 +99,45 @@ for ($i = 1; $i <= $modules; $i++) {
 			$count[$i]++;
 		}
 		#printf("fields[2]:%d   pct60:%f\n", $fields[2], $a);
+		my $color = "black";
 		if ($fields[2] >= $numtasks[$i] * 0.6) {
 			$pct60[$i]++;
+			$accepted{$fields[0]}++;
+		} else {
+		  $color = "red";
 		}
+
 		if ($fields[2] >= $numtasks[$i]) {
 			$alldone[$i]++;
 		}
+
+		# Concatenate point data for one module for this student
+		# there is a separate $line item for each student
+		$ll = sprintf("<td><font color=\"%s\">%d</font></td> <td><font color=\"%s\">%d</font></td> <td><font color=\"%s\">%.1f</font></td> ",
+			      $color, $fields[1],
+			      $color, $fields[2] - $fields[1],
+			      $color, $points);
+		$line{$fields[0]} = $line{$fields[0]} . $ll;
+		$upoints{$fields[0]} += $points;
+
 	}
 }
 
 open(FILE, "<", "module-1.csv");
+my $acount = 0;
 while(<FILE>) {
   @fields = split(',', $_);
   printf("<tr class=\"student\"> ");
   printf("<td>%s</td> ", $fields[0]);
   printf("%s", $line{$fields[0]});
-  printf("<td>%.1f</td></tr>\n", $upoints{$fields[0]});
+  printf("<td>%.1f</td>", $upoints{$fields[0]});
+  my $color = "red";
+  if ($accepted{$fields[0]} >= 5) {
+    $color = "black";
+    $acount++;
+  }
+  printf("<td><font color=\"%s\">%d</font></td></tr>\n",
+	 $color, $accepted{$fields[0]});
 }
 
 printf("<tr> <td></td> ");
@@ -122,7 +148,8 @@ for ($i = 1; $i <= $modules; $i++) {
   printf("all done: %d\n", $alldone[$i]);
   printf("</td> ");
 }
-printf("<td></td> </tr> ");
+printf("<td></td> ");
+printf("<td>%d</font></td> </tr>", $acount);
 
 print <<END;
     </tbody>
