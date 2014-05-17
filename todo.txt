@@ -1,0 +1,115 @@
+
+Valmistelut
+-----------
+* ssh login src.aalto.fi ja srcbak.netlab.hut.fi (Pasi)
+* Uusimman tmc-softan asentaminen testiserverille
+  (srcbak.netlab.hut.fi) (Markus)
+* Testikurssi serverille (Markus)
+* Pyritään forkkaamaan nuo tarvittavat github-repot sillä tavalla,
+  että voidaan tarvittaessa kontribuoida muutokset takaisinpäin.
+
+Komentoriviclient
+-----------------
+* Forkkaa https://github.com/JuhaniImberg/tmc.py
+* Testailua, miten toimi, mitä kaikkea pitää parantaa/lisätä. Seuraavat
+  toiminnot olisi hyvä olla (en ole itse ehtinyt katsoa mitä tuo tukee)
+  - Konfigurointi, jotka muistetaan sessioiden välillä
+    * Kjätunnus / salasana
+    * Kurssi
+  - Uusien tehtävien / päivitysten hakeminen
+  - Paikallinen testi
+  - Palautuksen submittaus, tulostuksen tuominen takaisin
+    * Myös palauteformin näyttäminen ja palautteen lähettäminen takaisin
+  - Pastebin submit
+  - "Move to task X", vaihtaa oletushakemiston sorsien äärelle
+  - Mitä muuta?
+* Komentoriviclient on kuulemma tehty uudemmalle TMC-API-versiolle kuin
+  mitä me ollaan käytetty ==> ei toimi sellaisenaan
+  - Päivitetäänkö serveri uudempaan? (ei voi testata samalla
+    serverillä kesäkurssin kanssa)
+  - Lisätäänkö tuki vanhaan API-versioon itse
+  - Jossain vaiheessa joudutaan varmaan kuitenkin päivittämään
+    uudempaan serveriin
+* Käytettävyys pitäisi olla helppo
+* Pitäisi toimia Linux, Mac OS, Windows + cygwin (tai
+  vastaava).
+* Muutokset Juhanille takaisin (jos hänelle sopii)
+
+
+tmc-check
+---------
+* Forkkaa https://github.com/testmycode/tmc-check
+
+* Tee tmc-check - frameworkistä Valgrind-ystävällinen (esim. check
+  vuotaa, ja tmc-check.c vuotaa myös)
+  - voi joutua puukottamaan myös check-kirjastoa
+
+* Joku fiksu systeemi muistinhallintaan
+  - Nyt fail poistuu testistä välittömästi ==> pitää olla tarkka
+    muistivuotojen kanssa. Keksisikö tuohon jotain fiksua tyyliin
+    testin mallocit jonkun wrapperin läpi, joka muistaa varaukset ja
+    sitten leak-vapaa fail, joka automaattisesti vapauttaa kaikki
+    testin tekemät varaukset.
+
+* Parempi tuki stdout - vertailuun, sekä selkeämpien virheilmoitusten
+  tulostamiseen
+  - Opiskelijan tuloste
+  - Referenssituloste
+  - Korosta eroavat kohdat
+  - Kenties voisi olla optio löysemmälle vertailulle, joka esimerkiksi
+    sallisi eroavaisuuksia valituille whitespaceille (viimeisin '\n'
+    etunenässä)
+  - Samankaltainen tuloste myös merkkijonojen/tiedostojen vertailuun
+    ylipäätään.
+
+* Parempi tuki stdin käsittelyyn.
+  - Sinänsä toimii, mutta voisi kapseloida johonkin helpompaan muotoon
+    kuin mitä nyt
+
+* Varmaan kannattaa tehdä pieni "kirjasto" tmc-checkin yhteyteen,
+  jossa noita apufunktioita
+
+
+Valgrind-tuki (joutuu jo katsomaan serverin suuntaan)
+-----------------------------------------------------
+
+* Forkkaa https://github.com/testmycode/tmc-server
+
+* Toimita serverin ajama Valgrind-tuloste clientille asti,
+  esim. Netbeans tai komentoriviclient. Erityisesti Mac +
+  Windows-käyttäjät riemastuvat
+
+* Optio siihen että Valgrind tuloste näytetään, mutta se ei estä
+  testin läpäisyä (lähinnä alkukierroksilla voisi olla armollinen)
+
+
+TMC-serveri
+-----------
+
+* Yksittäisen source.c - tiedoston palautukselle tuki -- ei zippejä
+
+* Palautelomake palautuksen yhteydessä (toimii nyt vain Netbeansissä
+  jostain syystä)
+
+* Helpompi pastebin-tuki webiliittymään
+
+* Tuki erilaisille pistepainotuksille
+  - Joku tehtävä voi antaa enemmän pisteitä kuin toinen
+  - Pistemäärä voi muuttua ajan myötä. Nyt oli 1 piste vs. .5 pistettä,
+    jota TMC ei osannut näyttää. Tehtävän pistemäärä voi olla konfattu
+    .tmcrc:hen, josta sitä voi skripti käydä deadlinen yhteydessä
+    päivittämässä
+  - Pisteiden selkeä näyttäminen käyttöliitymässä
+
+* IRC-interface webin kautta (eikös noita webbipohjaisia
+  irkkisysteemeitä ole, linkki johonkin sellaiseen)
+
+* Facebook + Twitter - tuki: opiskelijalla optiona submitata päivitys
+  läpäistyn tehtävän/kierroksen yhteydessä (ei hajuakaan miten tää
+  tehdään käytännössä)
+
+Uusien tehtävien ideointia ja koodausta
+---------------------------------------
+
+* Aina kun ideoita tulee ja intoa riittää. Mutta varmaan kannattaa
+  ensin fiksailla tmc-check.
