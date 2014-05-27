@@ -1,0 +1,17 @@
+
+points.pl	Reads points from csv files fetched from TMC for one module
+		(given as parameter). One file is fetched at primary
+		deadline, other is at the secondary deadline and gives
+		half points. Produces csv file with combined
+		information:
+		"student id,full-point-exercises,half-point-exercises"
+
+output.pl	Produces html output of the points in different
+		modules, based on output created by points.pl. Shows
+		scoring information, taking into account the full
+		point / half point separation. Also shows how many
+		modules are succesfully accepted.
+
+make-csv.pl	Produces csv file with similar information than what
+		output.pl produces. Could be imported to excel, for
+		example.
