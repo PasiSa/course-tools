@@ -9,7 +9,6 @@
 # Example: ../git-tools/combine-pts.py tentti-2014-08-25-pts-1-2.csv tentti-2014-08-25-pts-3-4.csv tentti-2014-08-25-pts-5.csv >testi
 
 import sys
-from subprocess import call
 
 a = sys.argv.pop(0)
 
@@ -51,5 +50,6 @@ for fname in sys.argv:
 for i in sorted(lname.keys()):
     scorestr = ""
     scorestr =  ";".join([str(x) for x in scores[i]] )
+    scorestr = scorestr.replace("-1", "")
     print i + ";" + lname[i] + ";" + ename[i] + ";" + scorestr
     
