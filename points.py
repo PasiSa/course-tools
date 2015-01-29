@@ -1,8 +1,15 @@
 #!/usr/bin/python
+#
+# Generates HTML table from daily TMC point snapshots (in csv)
+# (This replaces the old crappy perl scripts from last year...)
 
 import sys
 from sets import Set
+import time
+from datetime import date
 
+# Read config file. One line in config file represents one module
+# Format: <full points snapshot> <half points snapshot> <number of tasks>
 def read_conf():
     f = open("points.conf", "r")
     conf = []
@@ -17,8 +24,9 @@ def read_conf():
         
     return conf
 
+
+# Read csv file with student points in different modules
 def read_points(file, points, modidx, students):
-    #print "opening " + file
     f = open(file, "r")
     for line in f:
         line = line.rstrip('\r\n;')
@@ -41,16 +49,18 @@ def read_points(file, points, modidx, students):
             
         cur[modidx] = p
         points[student] = cur
-        #print "full " + student + ": ", points[student]
 
+
+# Output the HTML table
 def print_html(fullpoints, halfpoints, students, conf):
+    today = date.today()
     print """<html>
 <head>
 <meta charset='utf-8'>
 <meta content='width=device-width, initial-scale=1, maximum-scale=1' name='viewport'>
 <title>C programming - weighed exercise points</title>
 <link href="main.css" media="screen" rel="stylesheet" type="text/css" />
-<link href="bootstrap.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="bootstrap.min.css" media="screen" rel="stylesheet" type="text/css" />
 </head>
 
 <body class='default'>
@@ -58,7 +68,7 @@ def print_html(fullpoints, halfpoints, students, conf):
 <h1>Weighed exercise points</h1>
 """
 
-    timestamp = "XXX"
+    timestamp = today.isoformat()
     print("<b>Updated:</b> %s<br/>\n" % timestamp);
 
     print """
@@ -105,7 +115,7 @@ Passed
     numtasks = [0] * 6
     for i in range(0, len(conf)):
         m = conf[i]
-        numtasks[i] = m[2]
+        numtasks[i] = int(m[2])
     
     for s in sorted(students):
         print("<tr class=\"student\"> "),
@@ -165,12 +175,11 @@ conf = read_conf()
 
 fullpoints = { }
 halfpoints = { }
+students = Set()
 
 for i in range(0, len(conf)):
     modfiles = conf[i]
-    students = Set()
     read_points(modfiles[0], fullpoints, i, students)
     read_points(modfiles[1], halfpoints, i, students)
 
-#print halfpoints
 print_html(fullpoints, halfpoints, students, conf)
