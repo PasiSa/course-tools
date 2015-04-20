@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# Script originally by Jamo, modified by Pasi
+
+
 ID_FILE=".tmcid"
 API_VERSION=7
 
@@ -36,7 +40,8 @@ show-exercise() {
   id=$(parse-int "$1" 'id')
   user_id=$(parse-int "$1" 'user_id')
   ex_name=$(parse-string "$1" 'exercise_name')
-  url="https://tmc.mooc.fi/staging/submissions/$id.zip"
+  url="$SERVER/submissions/$id.zip"
+#  url="https://tmc.mooc.fi/staging/submissions/$id.zip"
   echo
   echo "user: $id ex: $ex_name zip: $url"
   zip_name="$id-$user_id-$ex_name"
@@ -58,6 +63,13 @@ list-submissions() {
   done
 }
 
+list-exid() {
+    url="$SERVER/exercises/$1.json?api_version=$API_VERSION"
+    tmc $url | grep -Eo '"submissions":\[.*\]' | grep -Eo '\{[^}]+\}' | while read exercise; do
+       (show-exercise $exercise) &
+    done
+}
+
 course-list-submissions() {
   tmc "$SERVER/courses/$1.json?api_version=$API_VERSION" | grep -Eo '"exercises":\[.*\]' | grep -Eo '\{[^}]+\}' | while read exercise; do
     list-submissions "$exercise"
@@ -72,4 +84,7 @@ else
   config
 fi
 
-course-list-submissions $1
+# From original Jamo's script: fetch all. I'm only doing one exercise at a time
+#course-list-submissions $1
+
+list-exid $1
