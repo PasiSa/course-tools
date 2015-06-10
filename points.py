@@ -1,12 +1,15 @@
 #!/usr/bin/python
 #
-# Generates HTML table from daily TMC point snapshots (in csv)
+# Generates HTML table or CSV file from daily TMC point snapshots (that are in csv)
 # (This replaces the old crappy perl scripts from last year...)
+#
+# by default HTML output, -c option causes it to be csv for publishing results
 
 import sys
 from sets import Set
 import time
 from datetime import date
+import sys, getopt
 
 # Read config file. One line in config file represents one module
 # Format: <full points snapshot> <half points snapshot> <number of tasks>
@@ -51,6 +54,43 @@ def read_points(file, points, modidx, students):
         points[student] = cur
 
 
+# Output in CSV format
+def print_csv(fullpoints, halfpoints, students, conf):
+    alldone = [0] * 6
+    acount = 0
+    numtasks = [0] * 6
+    for i in range(0, len(conf)):
+        m = conf[i]
+        numtasks[i] = int(m[2])
+    
+    for s in sorted(students):
+        output = "%s;" % s
+        
+        totalpoints = 0
+        accepted = 0
+        for i in range(0, len(conf)):
+            try:
+                fp = fullpoints[s]
+                fpi = int(fp[i])
+            except KeyError:
+                fpi = 0
+                
+            hp = halfpoints[s]
+            points = float(fpi) + float(hp[i] - fpi) / 2
+            if hp[i] > float(numtasks[i]) * 0.6:
+                accepted = accepted + 1
+                output = output + "1;"
+            else:
+                output = output + "0;"
+                
+            totalpoints = totalpoints + points
+            output = output + "%.1f;" % points
+            
+        output = output + "%.1f;" % totalpoints
+        output = output + "%d" % accepted
+        print(output)
+
+        
 # Output the HTML table
 def print_html(fullpoints, halfpoints, students, conf):
     today = date.today()
@@ -171,15 +211,37 @@ Passed
     
 ### main execution starts here
             
-conf = read_conf()
+def main(argv):
+    conf = read_conf()
 
-fullpoints = { }
-halfpoints = { }
-students = Set()
+    fullpoints = { }
+    halfpoints = { }
+    students = Set()
+    output = 'html'
 
-for i in range(0, len(conf)):
-    modfiles = conf[i]
-    read_points(modfiles[0], fullpoints, i, students)
-    read_points(modfiles[1], halfpoints, i, students)
+    for i in range(0, len(conf)):
+        modfiles = conf[i]
+        read_points(modfiles[0], fullpoints, i, students)
+        read_points(modfiles[1], halfpoints, i, students)
 
-print_html(fullpoints, halfpoints, students, conf)
+    try:
+        opts, args = getopt.getopt(argv,"hc",["ifile=","ofile="])
+    except getopt.GetoptError:
+        print 'test.py [-c]'
+        sys.exit(2)
+
+
+    for opt, arg in opts:
+        if opt == '-h':
+            print 'test.py [-c]'
+            sys.exit()
+        elif opt == '-c':
+            output = 'csv'
+
+    if output == 'csv':
+        print_csv(fullpoints, halfpoints, students, conf)
+    else:
+        print_html(fullpoints, halfpoints, students, conf)
+
+if __name__ == "__main__":
+   main(sys.argv[1:])
