@@ -20,7 +20,7 @@ for fname in sys.argv:
     f = open(fname, "r")
     for line in f:
         # Get rid of Mac/Win/Unix newlines
-        line = line.rstrip('\r\n;')
+        line = line.rstrip('\r\n;,')
         if line.startswith('#'):
             continue
         arr = line.split(';')
