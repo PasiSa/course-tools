@@ -28,7 +28,12 @@ for line in f:
 f = open(sys.argv[1], "r")
 for line in f:
     fields = line.split(';')
-    # Exercises not done, fill matching number of zeros
+
+    # Exam not done, skip the line
+    if len(fields) < 4:
+        continue
+    
+    # Exercises not done, fill matching number of zeros    
     if fields[0] not in stline:
         print line.rstrip() + ";" + "0;0;0;0;0;0;0;0;0;0;0;0;0;0"
         continue
