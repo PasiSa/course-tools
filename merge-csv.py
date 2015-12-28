@@ -15,17 +15,25 @@ import sys
 # Number of available points in each module
 stline = dict()
 
-# My Courses points
+# In some cases fields are surrounded by double quotes
+# Also tries to consider both ';' and ',' as field separator
 f = open(sys.argv[2], "r")
 for line in f:
     fields = line.rstrip().replace(",", ";").split(";")
-    stline[fields[0]] = ""
-    for i in fields[0:len(fields)]:
-        stline[fields[0]] = stline[fields[0]] + i + ";"
+
+    # ignore too short lines
+    if len(fields) > 4:
+        k = fields[0].strip('\"')
+        stline[k] = ""
+        for i in fields[0:len(fields)]:
+            stline[k] = stline[k] + i.strip('\"') + ";"
     
 f = open(sys.argv[1], "r")
 for line in f:
     fields = line.replace(",", ";").split(";")
-    k = fields[0].strip('\"')
-    if k in stline:
-        print line.rstrip() + ";" + stline[k]
+
+    # ignore too short lines
+    if len(fields) > 4:
+        k = fields[0].strip('\"')
+        if k in stline:
+            print line.rstrip() + ";" + stline[k]
