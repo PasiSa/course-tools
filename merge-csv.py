@@ -23,7 +23,7 @@ for line in f:
 
     # ignore too short lines
     if len(fields) > 4:
-        k = fields[0].strip('\"')
+        k = fields[0].strip('\"').upper()
         stline[k] = ""
         for i in fields[0:len(fields)]:
             stline[k] = stline[k] + i.strip('\"') + ";"
@@ -34,6 +34,6 @@ for line in f:
 
     # ignore too short lines
     if len(fields) > 4:
-        k = fields[0].strip('\"')
+        k = fields[0].strip('\"').upper()
         if k in stline:
             print line.rstrip() + ";" + stline[k]

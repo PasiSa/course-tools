@@ -44,10 +44,13 @@ for fname in sys.argv:
             if i - 2 >= len(taskspec):
                 sys.stderr.write("Warning: " + fname + ": student " + id + " has unexpected nr of columns: " + line + "\n")
             else:
-                scores[id][int(taskspec[i-2])-1] = arr[i]
+                scores[id][int(taskspec[i-2])-1] = float(arr[i])
 
 # finally, output what we got, ordered by student id
 for i in sorted(lname.keys()):
+    # ignore lines where no scores were given
+    if sum(scores[i]) == -5:
+        continue
     scorestr = ""
     scorestr =  ";".join([str(x) for x in scores[i]] )
     scorestr = scorestr.replace("-1", "")
