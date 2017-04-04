@@ -37,7 +37,7 @@ def read_file(fname, points):
         student = arr[1].strip('\"')
 
         try:
-            pts = int(arr[3])
+            pts = float(arr[3])
         except ValueError:
             continue
 
