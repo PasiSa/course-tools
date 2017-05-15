@@ -35,7 +35,7 @@ for fname in sys.argv:
         if id not in lname:
             lname[id] = arr[1]
             ename[id] = arr[2]
-            scores[id] = [ -1, -1, -1, -1, -1 ]
+            scores[id] = [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ]
 
         for i in range(3, len(arr)):
             # it is possible that some lines have too many fields
@@ -44,7 +44,12 @@ for fname in sys.argv:
             if i - 2 >= len(taskspec):
                 sys.stderr.write("Warning: " + fname + ": student " + id + " has unexpected nr of columns: " + line + "\n")
             else:
-                scores[id][int(taskspec[i-2])-1] = float(arr[i])
+                if scores[id][int(taskspec[i-2])-1] > -1:
+                    sys.stderr.write("Duplicate points: " + fname + ": student " + id + "\n")
+                try:
+                    scores[id][int(taskspec[i-2])-1] = float(arr[i])
+                except ValueError:
+                    sys.stderr.write("ValueError: " + fname + ": student " + id + ": '" + arr[i] + "'\n") 
 
 # finally, output what we got, ordered by student id
 for i in sorted(lname.keys()):
