@@ -37,3 +37,6 @@ for line in f:
         k = fields[0].strip('\"').upper()
         if k in stline:
             print line.rstrip() + ";" + stline[k]
+        else:
+            print line.rstrip()
+            
