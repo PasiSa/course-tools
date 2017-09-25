@@ -23,7 +23,6 @@ def read_index(ptsindex):
         if line.startswith('#') or len(line) == 0:
             continue
         ptsindex.append(line)
-#        print("testi: " + line)
 
         
 # Reads one TIM-exported points csv file
