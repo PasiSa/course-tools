@@ -9,7 +9,7 @@
 
 # Order is based on the first file, where second file is appended
 
-
+from __future__ import print_function
 import sys
 
 # Number of available points in each module
@@ -36,7 +36,10 @@ for line in f:
     if len(fields) > 1:
         k = fields[0].strip('\"').upper()
         if k in stline:
-            print line.rstrip() + ";" + stline[k]
+            print(line.rstrip() + ";" + stline[k])
         else:
-            print line.rstrip()
-            
+            print(line.rstrip() + " ", end="")
+            if (len(sys.argv) > 3):
+                print(';' * int(sys.argv[3]))
+            else:
+                print()
