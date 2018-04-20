@@ -6,6 +6,8 @@
 # Example: ../git-tools/merge-csv.py tentti-2014-08-25-pts-all.csv exercises.csv
 # (tentti-2014-08-25-pts-all.csv produced with combine-pts.py)
 # (exercises.csv produced with points.py -c)
+#
+# Argv[3]: number of fields expected
 
 # Order is based on the first file, where second file is appended
 
