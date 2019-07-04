@@ -34,10 +34,11 @@ def read_file(fname, param, table):
                 table[student] = dict()
             table[student][param] = score
             score = -1
-            
+
 table = { }
 read_file(sys.argv[1] + "-difficulty.txt", "diff", table)
 read_file(sys.argv[1] + "-learning.txt", "learn", table)
+read_file(sys.argv[1] + "-hours.txt", "hours", table)  # this may not be present always
 
 for a in table.keys():
     try:
@@ -49,6 +50,10 @@ for a in table.keys():
         slearn = str(table[a]['learn'])
     except KeyError:
         slearn = '-1'
-        
-    print str(a) + ";" + sdiff + ";" + slearn
-    
+
+    try:
+        shours = str(table[a]['hours'])
+    except KeyError:
+        shours = '-1'
+
+    print str(a) + ";" + sdiff + ";" + slearn + ";" + shours

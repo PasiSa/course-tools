@@ -1,6 +1,6 @@
-read.roundfb <- function(str, fb)
+read.roundfb <- function(str, fb, path="")
     {
-        fname <- sprintf("%s-summary.csv", str)
+        fname <- sprintf("%s/../feedback/%s-summary.csv", path, str)
         a <- read.table(fname, sep=";")
         if (dim(a[a$V2 == -1,])[1] > 0)
             {
@@ -10,29 +10,33 @@ read.roundfb <- function(str, fb)
             {
                 a[a$V3 == -1,]$V3 <- NA
             }
+        if (dim(a[a$V4 == -1,])[1] > 0)
+            {
+                a[a$V4 == -1,]$V4 <- NA
+            }
         fb[[str]] <- a
         return(fb)
     }
 
-read.all <- function()
-    {
-        fb <- c()
-        fb <- read.roundfb("01", fb)
-        fb <- read.roundfb("02", fb)
-        return(fb)
-    }
+#read.all <- function()
+#    {
+#        fb <- c()
+#        fb <- read.roundfb("01", fb)
+#        fb <- read.roundfb("02", fb)
+#        return(fb)
+#    }
 
-hist.feedback <- function(str, feedback)
+hist.feedback <- function(str, feedback, path)
     {
         mytitle <- sprintf("Round %s: How difficult was this round?", str)
-        fname <- sprintf("../stats/%s-diff.svg", str)
+        fname <- sprintf("%s/%s-diff.svg", path, str)
         #png(fname)
         svg(fname, width=7, height=7)
         hist(feedback[[str]]$V2, col="blue", las=1, xlab="1=easy, 5=difficult", main=mytitle)
         dev.off()
 
         mytitle <- sprintf("Round %s: Learning objectives achieved?", str)
-        fname <- sprintf("../stats/%s-learn.svg", str)
+        fname <- sprintf("%s/%s-learn.svg", path,str)
         #png(fname)
         svg(fname, width=7, height=7)
         hist(feedback[[str]]$V3, col="blue", las=1, xlab="1=disagree, 5=agree", main=mytitle)
@@ -142,7 +146,7 @@ cpp.one <- function(round, tasks, labels, allscoresname, roundname)
         fb <- c()
         fb <- read.roundfb(round, fb)
         hist.feedback(round, fb)
-        
+
         fname = sprintf("%s/ans-%s-all.csv", p, round)
         a <- read.answersummary(fname)
         tasksummary(a, tasks, labels, round, p)
@@ -199,7 +203,7 @@ sinkut.one <- function(round, tasks, labels, allscoresname, roundname)
 sinkut.all <- function()
     {
         allscoresname <- "allscores-2017-10-05.csv"
-        
+
         sinkut.one("01", c(" 170.Tavoitteet", " 170.Jaksolliset_signaalit",
                            " 170.Signaalin_energia", " 170.Desibeliasteikot"),
                    c("Tavoitteet", "Jaksolliset", "Energia", "Desibeli"),
@@ -221,13 +225,14 @@ sinkut.all <- function()
                    "viikko.3")
     }
 
-c.one <- function(round, tasks, labels, allscoresname, roundname)
+c.one <- function(round, tasks, labels, allscoresname, roundname, p)
     {
-        p <- "/Users/psarolah/opetus/c-ohjelmointi/c2018/stats/"
+        #p <- "/Users/psarolah/opetus/c-ohjelmointi/c2018/stats/"
+        #p <- path
         fb <- c()
-        fb <- read.roundfb(round, fb)
-        hist.feedback(round, fb)
-        
+        fb <- read.roundfb(round, fb, p)
+        hist.feedback(round, fb, p)
+
         fname = sprintf("%s/ans-%s-all.csv", p, round)
         a <- read.answersummary(fname)
         tasksummary(a, tasks, labels, round, p)
@@ -271,7 +276,7 @@ c.fbsummary <- function(p)
         rounds <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10")
         fb <- c()
         for (i in rounds) {
-            fb <- read.roundfb(i, fb)
+            fb <- read.roundfb(i, fb, p)
         }
 
         diff <- c()
@@ -280,6 +285,15 @@ c.fbsummary <- function(p)
             diff <- c(diff, mean(fb[[i]][["V2"]], na.rm = TRUE))
             learn <- c(learn, mean(fb[[i]][["V3"]], na.rm = TRUE))
         }
+
+        hours <- c()
+        for (i in rounds) {
+            hours[[i]] <- fb[[i]][["V4"]]
+        }
+        fname <- sprintf("%s/hours-summary.svg", p, round)
+        svg(fname, width=7, height=7)
+        boxplot(hours, ylim=c(0,30))
+        dev.off()
 
         fname <- sprintf("%s/feedback-summary.svg", p, round)
         svg(fname, width=7, height=7)
@@ -290,11 +304,83 @@ c.fbsummary <- function(p)
         dev.off()
     }
 
-c.summarystats <- function(allscoresname)
+c.summarystats <- function(allscoresname, path)
     {
-        path <- "/Users/psarolah/opetus/c-ohjelmointi/c2018/stats/"
+#        path <- "/Users/psarolah/opetus/c-ohjelmointi/c2018/stats/"
         c.fbsummary(path)
         pointdist(allscoresname, path)
+    }
+
+# setwd("/Users/psarolah/opetus/c-ohjelmointi/c2018/kesa/feedback")
+c.all.summer18 <- function()
+    {
+        allscoresname <- "../points/allscores-2018-08-03-fixed.csv"
+
+        c.summarystats(allscoresname, "/Users/psarolah/opetus/c-ohjelmointi/c2018/kesa/stats/")
+
+        path <- "/Users/psarolah/opetus/c-ohjelmointi/c2018/kesa/stats/"
+
+        c.one("01", c(" 4554.HelloWorld", " 4554.KorjaaLuvut",
+                        " 4554.PowerThree", " 4554.FractionSum",
+                        " 4554.OmaOhjelma", " 4554.Vektori"),
+                c("HelloWorld", "KorjaaLuvut", "PowerThree", "FractionSum",
+                  "OmaOhjelma", "Vektori"),
+              allscoresname, "X1.perusteet", path)
+
+        c.one("02", c(" 4555.Pii", " 4555.Lohkot",
+                        " 4555.Laskin", " 4555.For",
+                        " 4555.Kolmio", " 4555.ASCII"),
+                c("Pii", "Lohkot", "Laskin", "For",
+                  "Kolmio", "ASCII"),
+              allscoresname, "X2.syote.ja.tuloste", path)
+
+         c.one("03", c(" 4556.SegFault", " 4556.ReadInt",
+                       " 4556.ShowTable", " 4556.Taulukkoja",
+                       " 4556.CountChars", " 4556.Jarjestys"),
+               c("SegFault", "ReadInt", "ShowTable", "Taulukkoja",
+                 "CountChars", "Jarjestys"),
+               allscoresname, "X3.osoittimet", path)
+
+         c.one("04", c(" 4557.CountAlpha", " 4557.AddNames",
+                        " 4557.CountStr", " 4557.Shout",
+                        " 4557.NewString"),
+                c("CountAlpha", "AddNames", "CountStr", "Shout",
+                  "NewString"),
+              allscoresname, "X4.merkkijonot", path)
+
+        c.one("05", c(" 4558.Muistivuoto", " 4558.MyStrcat",
+                        " 4558.DynTaulukko", " 4558.LiitaTaulukko",
+                        " 4558.Koodisiistija"),
+                c("Muistivuoto", "MyStrcat", "DynTaulukko", "LiitaTaulukko",
+                  "Koodisiistija"),
+              allscoresname, "X5.dynaaminen.muisti", path)
+
+        c.one("06", c(" 4559.Ships", " 4559.BetterShips", " 4559.Zoo",
+                        " 4559.Murtoluku", " 4559.Jono"),
+                c("Ships", "BetterShips", "Zoo", "Murtoluku", "Jono"),
+              allscoresname, "X6.rakenteiset.tietotyypit", path)
+
+        c.one("07", c(" 4560.Jokudata", " 4560.StaticArr",
+                        " 4560.GameOfLife", " 4560.StringArray"),
+                c("Jokudata", "StaticArr", "GameOfLife", "StringArray"),
+              allscoresname, "X7.moniuloitteiset.taulukot", path)
+
+        c.one("08", c(" 4561.Heksamuunnos", " 4561.Bitti-1",
+                      " 4561.Bitti-2", " 4561.Bittioperaatiot",
+                      " 4561.TCP-otsake", " 4561.XOR-cipher"),
+              c("Heksamuunnos", "Bitti-1", "Bitti-2", "Bittioperaatiot",
+                "TCP-otsake", "XOR-cipher"),
+              allscoresname, "X8.binaarioperaatiot", path)
+
+        c.one("09", c(" 4562.Harjoittelua", " 4562.Hexdump",
+                      " 4562.Tilastoja", " 4562.Shop"),
+              c("Harjoittelua", "Hexdump", "Tilastoja", "Shop"),
+              allscoresname, "X9.i.o.virrat", path)
+
+#        c.one("10", c(" 1726.Makrot", " 1726.Tulostin",
+#                      " 1726.Funktio-osoittimet", " 1726.Luolapeli"),
+#              c("Makrot", "Tulostin", "Funktio-osoittimet", "Luolapeli"),
+#              allscoresname, "a.kehittyneet.piirteet")
     }
 
 # setwd("/Users/psarolah/opetus/c-ohjelmointi/c2018/feedback")
@@ -303,7 +389,7 @@ c.all <- function()
         allscoresname <- "../points/allscores-2018-04-05.csv"
 
         c.summarystats(allscoresname)
-        
+
         c.one("01", c(" 1692.HelloWorld", " 1692.KorjaaLuvut",
                         " 1692.PowerThree", " 1692.FractionSum",
                         " 1692.OmaOhjelma", " 1692.Vektori"),
@@ -324,7 +410,7 @@ c.all <- function()
                 c("SegFault", "ReadInt", "ShowTable", "Taulukkoja",
                   "MasterMind", "Jarjestys"),
               allscoresname, "X3.osoittimet")
-        
+
         c.one("04", c(" 1720.CountAlpha", " 1720.Kekkonen",
                         " 1720.CountStr", " 1720.NewString",
                         " 1720.Korsoraattori"),
